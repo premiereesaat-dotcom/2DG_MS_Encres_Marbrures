@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Atelier Encres · Suminagashi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Mise en page : un cahier de fabrication d'imprimeur — bande de contrôle CMJN en tête, fiches numérotées dans l'ordre de la séance, panneaux de manipulation à droite du texte. */
+:root{
+  --paper:#F6F7F9; --sheet:#FFFFFF; --ink:#15171F; --muted:#5A6070; --rule:#D9DDE5;
+  --c:#009FD8; --m:#D6006F; --y:#F5C400; --k:#15171F;
+  --accent:#0A6E99; --ok:#1E8A4C; --warn:#B4560A; --bad:#B3122E;
+  --field:#FFFFFF; --soft:#EEF1F5;
+  --f-display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",Roboto,Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#11141A; --sheet:#181C24; --ink:#E8EAF0; --muted:#9AA2B2; --rule:#2C3240;
+  --accent:#4DB8E6; --ok:#4CC27E; --warn:#E89A4C; --bad:#F06A80; --field:#0E1116; --soft:#1F2430; --k:#E8EAF0;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11141A; --sheet:#181C24; --ink:#E8EAF0; --muted:#9AA2B2; --rule:#2C3240;
+  --accent:#4DB8E6; --ok:#4CC27E; --warn:#E89A4C; --bad:#F06A80; --field:#0E1116; --soft:#1F2430; --k:#E8EAF0;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 var(--f-body)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.colorbar{display:flex;height:10px}
+.colorbar span{flex:1}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{padding-block:40px 24px;border-bottom:1px solid var(--rule)}
+.eyebrow{font:600 12px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(34px,6vw,64px);font-weight:700;letter-spacing:-.02em;margin-top:10px}
+h1 em{font-style:normal;background:linear-gradient(transparent 62%,color-mix(in srgb,var(--y) 70%,transparent) 62%)}
+h2{font-size:clamp(26px,3.4vw,36px);font-weight:700}
+h3{font-size:19px;font-weight:700}
+p{margin:0}
+.lead{max-width:68ch;font-size:18px;color:var(--muted);margin-top:14px}
+nav.steps{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--rule)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--paper)}
+nav.steps ol{list-style:none;margin:0;padding:10px 0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+nav.steps a{display:flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none;color:var(--ink);font:500 14px var(--f-body);padding:6px 10px;border-radius:6px;border:1px solid transparent}
+nav.steps a:hover,nav.steps a:focus-visible{border-color:var(--rule);background:var(--sheet);outline:none}
+nav.steps .n{font:600 11px var(--f-mono);color:var(--muted)}
+nav.steps .dot{width:8px;height:8px;border-radius:50%;background:var(--rule)}
+nav.steps a.done .dot{background:var(--ok)}
+main{display:grid;gap:56px;padding-block:40px 80px}
+section.block{display:grid;gap:22px;scroll-margin-top:70px}
+.sec-head{display:grid;gap:8px;border-top:3px solid var(--ink);padding-top:14px}
+.sec-head .tag{display:flex;gap:10px;align-items:center}
+.swatch{width:14px;height:14px;display:inline-block;border-radius:2px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.prose{display:grid;gap:12px;max-width:66ch}
+.prose ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.pair{display:grid;gap:10px}
+.pair .label{font:600 11px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.lab{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:16px;display:grid;gap:12px;min-width:0}
+.lab canvas{width:100%;height:auto;display:block;border-radius:6px;background:var(--soft)}
+.lab .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.lab label{font-size:14px;color:var(--muted)}
+.readout{font:600 14px var(--f-mono);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+button,.btn{font:600 14px var(--f-body);padding:9px 14px;border-radius:7px;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--ink)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button.seg[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.note{border-left:3px solid var(--c);background:var(--sheet);padding:12px 14px;font-size:15px;border-radius:0 8px 8px 0}
+.note.m{border-color:var(--m)} .note.y{border-color:var(--y)} .note.k{border-color:var(--ink)}
+.note b{font-family:var(--f-display)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:8px;background:var(--sheet)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+th{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--soft)}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.q{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:16px;display:grid;gap:12px}
+.q h3{font-size:16px;display:flex;gap:8px;align-items:baseline}
+.q h3 .qn{font:600 12px var(--f-mono);color:var(--accent)}
+.q .hint{font-size:14px;color:var(--muted)}
+textarea,input[type=text],input[type=url],select{width:100%;font:15px/1.5 var(--f-body);color:var(--ink);background:var(--field);border:1px solid var(--rule);border-radius:7px;padding:9px 11px}
+textarea{min-height:96px;resize:vertical}
+.count{font:12px var(--f-mono);color:var(--muted);text-align:right}
+.id-card{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.id-card{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.field{display:grid;gap:4px}
+.field span{font-size:13px;color:var(--muted)}
+.plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.plan div{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:10px 12px;font-size:14px}
+.plan .t{font:600 12px var(--f-mono);color:var(--accent);display:block}
+.quiz{display:grid;gap:14px}
+.quiz fieldset{border:1px solid var(--rule);border-radius:10px;padding:14px;margin:0;background:var(--sheet);display:grid;gap:8px}
+.quiz legend{font-weight:600;padding:0 6px}
+.quiz label{display:flex;gap:8px;align-items:flex-start;font-size:15px;cursor:pointer}
+.quiz .fb{font-size:14px}
+.quiz .fb.ok{color:var(--ok)} .quiz .fb.no{color:var(--bad)}
+.sources{display:grid;gap:12px}
+.src{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:14px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.src .w2{grid-column:span 2}.src .w3{grid-column:span 3}.src .w6{grid-column:span 6}
+@media (max-width:760px){.src{grid-template-columns:minmax(0,1fr)}.src .w2,.src .w3,.src .w6{grid-column:auto}}
+.src .head{display:flex;justify-content:space-between;align-items:center}
+.cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.case{position:relative;background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:14px;cursor:pointer;display:grid;gap:6px}
+.case input{position:absolute;opacity:0}
+.case:has(input:checked){border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.case:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.case b{font-family:var(--f-display);font-size:17px}
+.case p{font-size:14px;color:var(--muted)}
+.selfeval{display:grid;gap:8px}
+.selfeval .r{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:10px;align-items:center;background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:10px 12px}
+@media (max-width:600px){.selfeval .r{grid-template-columns:minmax(0,1fr)}}
+.lvl{display:flex;gap:6px;flex-wrap:wrap}
+.lvl label{font-size:13px;border:1px solid var(--rule);border-radius:20px;padding:4px 10px;cursor:pointer}
+.lvl input{position:absolute;opacity:0;pointer-events:none}
+.lvl label:has(input:checked){background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.final{background:var(--ink);color:var(--paper);border-radius:12px;padding:22px;display:grid;gap:14px}
+.final h2{color:var(--paper)}
+.final .row{display:flex;flex-wrap:wrap;gap:10px}
+.final button{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.final button.ghost{background:transparent;color:var(--paper);border-color:color-mix(in srgb,var(--paper) 50%,transparent)}
+.checklist{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:14px}
+.checklist li::before{content:"○ ";color:color-mix(in srgb,var(--paper) 60%,transparent)}
+.checklist li.ok::before{content:"● ";color:#5FD38D}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:14px;z-index:50}
+.cmyk svg{width:100%;max-width:340px;height:auto;display:block;margin:0 auto}
+footer{border-top:1px solid var(--rule);padding-block:20px 40px;color:var(--muted);font-size:13px}
+#report{display:none}
+
+/* ===== Impression : seul le dossier est imprimé ===== */
+@media print{
+  @page{size:A4;margin:16mm 15mm 18mm}
+  :root{--paper:#fff;--ink:#000;--muted:#444;--rule:#bbb;color-scheme:light}
+  body{background:#fff;color:#000;font-size:10.5pt}
+  body>*:not(#report){display:none!important}
+  body::before{display:none}
+  #report{display:block!important}
+}
+#report{font:10.5pt/1.45 var(--f-body);color:#000}
+#report .rbar{display:flex;height:6px;margin-bottom:10px}
+#report .rbar span{flex:1}
+#report h1{font-size:20pt;margin:0 0 2px}
+#report h2{font-size:13pt;margin:16px 0 6px;padding-bottom:3px;border-bottom:1.5px solid #000;break-after:avoid}
+#report h3{font-size:11pt;margin:10px 0 3px;break-after:avoid}
+#report .meta{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #000;margin:8px 0}
+#report .meta div{padding:5px 7px;border-right:1px solid #000}
+#report .meta div:last-child{border-right:0}
+#report .meta small{display:block;font:8pt var(--f-mono);text-transform:uppercase;color:#444}
+#report .ans{white-space:pre-wrap;border-left:2px solid #999;padding:2px 0 2px 8px;margin:2px 0 6px;break-inside:avoid}
+#report .empty{color:#a00;font-style:italic}
+#report table{font-size:9pt;margin:4px 0}
+#report th,#report td{border:1px solid #888;padding:4px 6px}
+#report th{background:#eee;color:#000}
+#report .grid-eval td:not(:first-child){text-align:center;width:13%}
+#report .sign{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+#report .sign div{border:1px solid #000;height:70px;padding:5px;font-size:9pt}
+#report .foot{margin-top:10px;font-size:8pt;color:#444}
+
+/* ===== Ajouts séance 2 ===== */
+.kit{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:0}
+.kit li{border:1px solid var(--rule);background:var(--sheet);border-radius:20px;padding:3px 10px;font-size:14px}
+.steps-list{counter-reset:st;list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.steps-list li{counter-increment:st;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start}
+.steps-list li::before{content:counter(st);font:600 12px/24px var(--f-mono);background:var(--ink);color:var(--paper);border-radius:50%;width:24px;height:24px;text-align:center}
+.imgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.imgslot{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px;display:grid;gap:8px;align-content:start}
+.imgslot .label{font:600 11px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.imgprev{aspect-ratio:4/3;background:var(--soft);border-radius:6px;display:grid;place-items:center;overflow:hidden;font-size:13px;color:var(--muted)}
+.imgprev img{width:100%;height:100%;object-fit:contain}
+.imgslot .row{display:flex;gap:8px;flex-wrap:wrap}
+label.btn{display:inline-flex;align-items:center;position:relative;cursor:pointer}
+label.btn:hover{border-color:var(--ink)}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+label.btn:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.lab canvas.touch{touch-action:none;cursor:crosshair}
+.lab .ctl{display:grid;gap:4px}
+.lab .ctl2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 16px}
+.status{font:600 15px/1.4 var(--f-mono)}
+.why{font-size:14px;color:var(--muted);margin:0;padding-left:18px}
+.cartel-form{display:grid;gap:10px}
+.pistes{display:flex;flex-wrap:wrap;gap:6px}
+.pistes span{font:13px var(--f-mono);background:var(--soft);border-radius:4px;padding:3px 8px}
+.case.sm{padding:12px}
+#report img{max-width:100%;max-height:100mm;display:block;margin:4px 0;break-inside:avoid}
+#report .imgrow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;break-inside:avoid}
+#report .imgrow img{max-height:48mm;width:100%;object-fit:contain;border:1px solid #ccc}
+#report .cartel{border:1px solid #000;padding:8px 12px;max-width:125mm;break-inside:avoid;margin:6px 0}
+#report .cartel p{margin:6px 0 0;white-space:pre-wrap}
+#report td,#report th{vertical-align:top}
+</style>
+</head>
+<body>
+<div class="colorbar" aria-hidden="true"><span style="background:var(--c)"></span><span style="background:var(--m)"></span><span style="background:var(--y)"></span><span style="background:#15171F"></span><span style="background:color-mix(in srgb,var(--c) 50%,var(--m))"></span><span style="background:color-mix(in srgb,var(--m) 50%,var(--y))"></span><span style="background:color-mix(in srgb,var(--y) 50%,var(--c))"></span><span style="background:#8A8F99"></span></div>
+<header class="top"><div class="wrap">
+  <div class="eyebrow">ESAAT · DN MADe Graphisme · Multisupport · Technologie et matériaux · Encres, séance 2</div>
+  <h1>Quand la tension superficielle <em>dessine</em></h1>
+  <p class="lead">Une goutte d'encre de Chine posée délicatement sur l'eau ne coule pas : elle flotte et s'étale. Une goutte d'eau savonneuse la repousse. Avec ces deux gestes, la technique japonaise du <b>suminagashi</b> (« encre flottante ») fait naître des marbrures qu'aucun logiciel n'imite vraiment. Vous allez comprendre le phénomène, l'expérimenter, chercher des références, puis créer une pièce graphique dont la matière est le phénomène lui-même.</p>
+</div></header>
+<nav class="steps" aria-label="Étapes de la séance"><div class="wrap"><ol id="stepnav"><li><a href="#identite" data-step="identite"><span class="dot"></span><span class="n">00</span>Identité</a></li><li><a href="#phenomene" data-step="phenomene"><span class="dot"></span><span class="n">01</span>Phénomène</a></li><li><a href="#experimentation" data-step="experimentation"><span class="dot"></span><span class="n">02</span>Expérimentation</a></li><li><a href="#references" data-step="references"><span class="dot"></span><span class="n">03</span>Références</a></li><li><a href="#creation" data-step="creation"><span class="dot"></span><span class="n">04</span>Création</a></li><li><a href="#cartel" data-step="cartel"><span class="dot"></span><span class="n">05</span>Cartel</a></li><li><a href="#export" data-step="export"><span class="dot"></span><span class="n">06</span>PDF</a></li></ol></div></nav>
+<main class="wrap">
+<section class="block" id="identite">
+  <div class="sec-head"><div class="tag"><span class="eyebrow">00 · Avant de commencer</span></div><h2>Votre identité et le déroulé</h2></div>
+  <div class="id-card">
+    <label class="field"><span>Nom *</span><input type="text" id="nom" data-k="nom" autocomplete="family-name"></label>
+    <label class="field"><span>Prénom *</span><input type="text" id="prenom" data-k="prenom" autocomplete="given-name"></label>
+    <label class="field"><span>Classe / groupe</span><input type="text" id="classe" data-k="classe"></label>
+    <label class="field"><span>Date</span><input type="text" id="date" data-k="date"></label>
+  </div>
+  <div class="plan"><div><span class="t">0:00 – 0:10</span>Lancement, démonstration, sécurité</div><div><span class="t">0:10 – 0:20</span>Fiche 01 : simulation et Q1</div><div><span class="t">0:20 – 0:55</span>Expérimentation, carnet, rangement</div><div><span class="t">0:55 – 1:15</span>Recherche de références</div><div><span class="t">1:15 – 1:45</span>Création</div><div><span class="t">1:45 – 2:00</span>Cartel et PDF</div></div>
+  <p class="note k"><b>Vos réponses et vos images sont enregistrées automatiquement</b> dans ce navigateur, sur cet appareil. Pour changer de poste, utilisez « Télécharger ma sauvegarde » en bas de page, puis « Reprendre une sauvegarde » sur l'autre poste.</p>
+</section><section class="block" id="phenomene">
+  <div class="sec-head"><div class="tag"><span class="swatch" style="background:var(--c)"></span><span class="eyebrow">01 · Comprendre</span></div><h2>Une surface tendue, une goutte qui pousse</h2></div>
+  <div class="grid2">
+    <div class="prose">
+      <p><b>La tension superficielle.</b> Au cœur de l'eau, chaque molécule est attirée de tous côtés par ses voisines. À la surface, elle n'a de voisines que vers le bas : elle est tirée vers l'intérieur. La surface se comporte alors comme une membrane tendue. Cette tension γ s'exprime en millinewtons par mètre (mN/m) : environ <b>72 mN/m</b> pour l'eau pure à 20 °C, <b>25 à 35 mN/m</b> pour de l'eau additionnée de liquide vaisselle.</p>
+      <p><b>Pourquoi l'encre flotte.</b> L'encre de Chine est faite de noir de carbone (de la suie, en particules très fines), d'un liant (colle animale ou gomme-laque) et d'eau. Déposée sans être enfoncée, une partie de l'encre s'étale en un film très mince à la surface de l'eau, comme une goutte d'huile s'étale sur une flaque.</p>
+      <p><b>Le tensioactif.</b> Le liquide vaisselle contient des molécules à deux têtes : une partie aime l'eau, l'autre la fuit. Elles se rangent à la surface et font chuter la tension superficielle là où on les dépose.</p>
+      <p><b>L'effet Marangoni.</b> Une surface est toujours tirée vers les zones où la tension est la plus forte. Une goutte de tensioactif crée une zone de faible tension : la surface s'enfuit vers l'extérieur et emporte le film d'encre. En alternant encre et tensioactif au même point, on obtient des anneaux concentriques. On voit le même effet dans les « larmes du vin » sur la paroi d'un verre, ou quand du poivre saupoudré sur l'eau fuit un doigt savonneux.</p>
+      <p class="note y"><b>Ce qui compte pour le graphiste.</b> Une marbrure est la mémoire des gestes : chaque anneau garde l'ordre des gouttes, chaque souffle ou trait de cure-dent l'étire. Au transfert, l'image est <b>inversée</b> (comme un monotype), et son rendu dépend de l'absorption du papier, ce que vous avez vu en séance 1 avec l'engraissement et la mouillabilité.</p>
+    </div>
+    <div class="lab">
+      <div class="pair"><span class="label">Manipulation : un bain de suminagashi</span></div>
+      <canvas id="cvMarb" class="touch" width="600" height="420" aria-label="Simulation vue de dessus d'un bain d'eau : cliquez pour déposer des gouttes d'encre ou de tensioactif, glissez pour déformer les anneaux"></canvas>
+      <div class="row" role="group" aria-label="Outil">
+        <button class="seg" aria-pressed="true" data-mmode="ink">Goutte d'encre</button>
+        <button class="seg" aria-pressed="false" data-mmode="surf">Goutte de tensioactif</button>
+        <button class="seg" aria-pressed="false" data-mmode="stylus">Stylet (glisser)</button>
+      </div>
+      <div class="ctl2">
+        <div class="ctl"><label for="dropR">Taille de la goutte <span class="readout" id="dropRv"></span></label><input type="range" id="dropR" min="6" max="45" step="1" value="20"></div>
+        <div class="ctl"><span style="font-size:14px;color:var(--muted)">Encre</span><div class="row"><button class="seg" aria-pressed="true" data-tone="pur">Pure</button><button class="seg" aria-pressed="false" data-tone="dilue">Diluée</button></div></div>
+      </div>
+      <div class="row">
+        <button id="seq">Séquence : 16 gouttes alternées</button>
+        <button id="combH">Peigne horizontal</button>
+        <button id="combV">Peigne vertical</button>
+        <button id="clearMarb">Vider le bain</button>
+      </div>
+      <div class="ctl2">
+        <label for="papMarb">Papier du tirage
+          <select id="papMarb"><option value="machine">Papier machine</option><option value="japon">Papier fin absorbant (type japon)</option><option value="kraft">Kraft</option><option value="couche">Papier couché (magazine)</option></select></label>
+        <div class="ctl" style="align-content:end"><button id="printMarb" class="seg" aria-pressed="false">Transférer sur papier</button></div>
+      </div>
+      <span class="readout" id="marbInfo"></span>
+      <p style="font-size:14px;color:var(--muted)" id="marbTxt"></p>
+      <p style="font-size:13px;color:var(--muted)">Modèle simplifié : chaque goutte de rayon r repousse les anneaux existants en conservant leur surface, ce qui correspond à la description mathématique classique du marbling. Le vrai bain ajoute courants, diffusion et poussières.</p>
+    </div>
+  </div>
+  <div class="q"><h3><span class="qn">Q1</span>Analyse</h3><p>Dans la simulation, déposez au même endroit une dizaine de gouttes en alternant encre et tensioactif, puis une goutte de tensioactif à côté des anneaux. Décrivez ce que vous observez et expliquez-le en employant les mots « tension superficielle », « tensioactif » et « effet Marangoni ». Que change le transfert sur papier couché ?</p><textarea data-k="q1" id="q1"></textarea></div>
+</section><section class="block" id="experimentation">
+  <div class="sec-head"><div class="tag"><span class="swatch" style="background:var(--m)"></span><span class="eyebrow">02 · Expérimenter</span></div><h2>Protocole et carnet d'essais</h2></div>
+  <div class="grid2">
+    <div class="prose">
+      <p><b>Matériel par binôme</b></p>
+      <ul class="kit"><li>bac plat, 3 à 5 cm d'eau à température ambiante</li><li>encre de Chine</li><li>2 pinceaux fins (un par liquide, jamais mélangés)</li><li>petit pot : eau + 1 goutte de liquide vaisselle</li><li>cure-dents, paille, peigne</li><li>bandes de papier journal</li><li>papiers : machine, dessin, kraft, papier fin, page de magazine</li><li>journal pour le séchage</li><li>smartphone</li></ul>
+      <p class="note m"><b>Sécurité et propreté.</b> Blouse ou vieux vêtements : l'encre de Chine ne part pas des textiles. Protégez la table. Évitez tout contact du liquide vaisselle avec les yeux. Essuyez l'eau renversée (sol glissant). Gardez 5 minutes en fin d'expérimentation pour vider les bacs à l'évier et rincer les pinceaux.</p>
+      <p class="note"><b>Si l'encre coule au fond</b> : posez la pointe du pinceau plus à plat et plus lentement, sans enfoncer ; ajoutez une trace infime de tensioactif dans l'encre elle-même ; essayez une autre encre. Certaines encres de Chine flottent mieux que d'autres : c'est un résultat d'essai à noter, pas un échec.</p>
+    </div>
+    <div class="prose">
+      <p><b>Protocole</b></p>
+      <ol class="steps-list">
+        <li><span>Remplissez le bac et laissez l'eau se calmer. <b>Écrémez</b> la surface en y faisant glisser une bande de journal : poussières et traces de gras agissent comme des tensioactifs parasites.</span></li>
+        <li><span>Touchez la surface avec la pointe du pinceau d'encre, sans l'enfoncer : un disque gris apparaît.</span></li>
+        <li><span>Touchez le centre du disque avec le pinceau de tensioactif : le disque devient anneau. Alternez 10 à 20 fois.</span></li>
+        <li><span>Déformez si vous le souhaitez : soufflez à la paille, tirez un cure-dent, passez un peigne.</span></li>
+        <li><span>Posez la feuille à plat en la déroulant d'un bord vers l'autre pour chasser l'air. Laissez 3 à 5 secondes, soulevez par un coin, faites sécher à plat.</span></li>
+        <li><span>Photographiez chaque tirage à plat, à la lumière du jour si possible, et numérotez-le.</span></li>
+        <li><span>Écrémez avant chaque nouveau tirage. <b>Un seul paramètre change à la fois</b> d'un essai à l'autre.</span></li>
+      </ol>
+    </div>
+  </div>
+  <div class="sources" id="essais"></div>
+  <div><button type="button" id="addEssai">Ajouter un essai</button></div>
+  <div class="pair"><span class="label">Vos trois meilleures traces (photos)</span></div>
+  <div class="imgs"><div class="imgslot"><span class="label">Trace 1</span><div class="imgprev" data-imgprev="t1"></div><div class="row"><label class="btn">Choisir une image<input type="file" accept="image/*" data-img="t1" class="vh"></label><button type="button" data-imgdel="t1" hidden>Retirer</button></div></div><div class="imgslot"><span class="label">Trace 2</span><div class="imgprev" data-imgprev="t2"></div><div class="row"><label class="btn">Choisir une image<input type="file" accept="image/*" data-img="t2" class="vh"></label><button type="button" data-imgdel="t2" hidden>Retirer</button></div></div><div class="imgslot"><span class="label">Trace 3</span><div class="imgprev" data-imgprev="t3"></div><div class="row"><label class="btn">Choisir une image<input type="file" accept="image/*" data-img="t3" class="vh"></label><button type="button" data-imgdel="t3" hidden>Retirer</button></div></div></div>
+  <div class="q"><h3><span class="qn">Q2</span>Bilan</h3><p>Quel est votre essai le plus réussi graphiquement ? Quels paramètres l'expliquent physiquement ? Quel essai a échoué, et pourquoi ? Qu'auriez-vous testé avec plus de temps ?</p><textarea data-k="q2" id="q2"></textarea></div>
+</section><section class="block" id="references">
+  <div class="sec-head"><div class="tag"><span class="eyebrow">03 · Recherche documentaire</span></div><h2>Trois références de natures différentes</h2></div>
+  <div class="grid2">
+    <div class="prose">
+      <p>Cherchez au moins <b>trois références de natures différentes</b>, qui nourrissent votre création et votre compréhension :</p>
+      <ul><li>une référence <b>historique ou artistique</b> : suminagashi au Japon, ebru en Turquie (inscrit au patrimoine culturel immatériel de l'UNESCO), papiers marbrés des reliures européennes, artistes de l'encre ;</li><li>une référence de <b>design contemporain</b> : affiche, édition, identité visuelle, pochette de disque, motion design qui utilise des marbrures ou de l'encre dans l'eau ;</li><li>une référence <b>scientifique ou technique</b> qui explique le phénomène : tension superficielle, tensioactifs, effet Marangoni, modélisation du marbling.</li></ul>
+      <p><b>Pistes de mots-clés</b> (à combiner, à traduire en anglais ou en japonais romanisé) :</p>
+      <div class="pistes"><span>suminagashi</span><span>ebru</span><span>papier marbré</span><span>marbled paper</span><span>papier de garde reliure</span><span>effet Marangoni</span><span>larmes du vin</span><span>tensioactif</span><span>mathematical marbling</span><span>ink in water photography</span><span>marbrure identité visuelle</span><span>marbling album cover</span></div>
+    </div>
+    <div class="note k" style="display:grid;gap:8px">
+      <b>Grille de fiabilité : quatre questions</b>
+      <span><b>Qui ?</b> L'auteur, l'artiste ou l'organisme est-il identifié ?</span>
+      <span><b>Quand ?</b> La date de l'œuvre ou du document est-elle connue ?</span>
+      <span><b>Pourquoi ?</b> Informer, vendre, montrer un portfolio ? Une image sans légende ni auteur (Pinterest, banque d'images) n'est pas une référence : remontez à la source.</span>
+      <span><b>Vérifiable ?</b> L'information est-elle confirmée par une autre source indépendante ?</span>
+      <b style="margin-top:6px">Format de citation</b>
+      <span style="font-family:var(--f-mono);font-size:13px">AUTEUR ou ORGANISME. <i>Titre</i>. Site, éditeur ou lieu, date. URL (consulté le JJ/MM/AAAA).</span>
+    </div>
+  </div>
+  <label class="field" style="max-width:620px"><span>Axe de recherche</span><input type="text" id="notion" data-k="notion"></label>
+  <div class="sources" id="sources"></div>
+  <div><button type="button" id="addSrc">Ajouter une référence</button></div>
+  <div class="q"><h3><span class="qn">Q3</span>Croisement des références</h3><p>Qu'ont en commun vos références ? En quoi l'une apporte-t-elle quelque chose que les autres n'ont pas ? Laquelle jugez-vous la plus fiable, et pourquoi ? Laquelle influence le plus votre création ?</p><textarea data-k="qcross" id="qcross"></textarea></div>
+</section><section class="block" id="creation">
+  <div class="sec-head"><div class="tag"><span class="swatch" style="background:var(--y)"></span><span class="eyebrow">04 · Créer</span></div><h2>Du phénomène à la pièce graphique</h2></div>
+  <div class="grid2">
+    <div class="prose">
+      <p><b>Consigne.</b> À partir de vos traces réelles, concevez une pièce graphique dans l'un des quatre formats ci-dessous. Le phénomène n'est pas un décor : votre pièce doit <b>le rendre lisible</b>. Le regardeur doit pouvoir deviner qu'il s'agit d'encre poussée par l'eau.</p>
+      <ul>
+        <li>au moins une trace réelle scannée ou photographiée, sans filtre qui imite la marbrure ;</li>
+        <li>au moins un élément typographique ;</li>
+        <li>une mention discrète de la technique (par exemple « suminagashi, encre de Chine sur papier ») ;</li>
+        <li>travail à la main ou sur logiciel à partir des scans : recadrage, changement d'échelle, inversion, contraste, répétition… ;</li>
+        <li>à rendre : une photo ou un export du visuel, importé ci-dessous.</li>
+      </ul>
+    </div>
+    <div class="note k" style="display:grid;gap:6px">
+      <b>Leviers graphiques à interroger</b>
+      <span><b>Échelle</b> : un détail de 2 cm agrandi en affiche devient un paysage.</span>
+      <span><b>Cadrage</b> : le centre des anneaux, ou leur bord étiré ?</span>
+      <span><b>Contraste</b> : encre pure ou diluée, fond clair ou image inversée.</span>
+      <span><b>Rapport texte / matière</b> : la typographie se pose sur la marbrure, s'y découpe, ou est elle-même tracée dans le bain.</span>
+      <span><b>Série</b> : plusieurs tirages du même bain ne sont jamais identiques.</span>
+    </div>
+  </div>
+  <div class="cases">
+    <label class="case sm"><input type="radio" name="cr_format" value="A" data-k="cr_format"><b>A · Affiche A3</b><p>Pour un événement réel ou fictif : festival, exposition, concert, conférence.</p></label>
+    <label class="case sm"><input type="radio" name="cr_format" value="B" data-k="cr_format"><b>B · Couverture</b><p>Livre, revue ou disque : la marbrure porte le titre et l'univers.</p></label>
+    <label class="case sm"><input type="radio" name="cr_format" value="C" data-k="cr_format"><b>C · Lettrine ou alphabet</b><p>Des lettres construites, découpées ou révélées par la marbrure.</p></label>
+    <label class="case sm"><input type="radio" name="cr_format" value="D" data-k="cr_format"><b>D · Papier de garde</b><p>Motif répétable pour une édition, comme les gardes marbrées des reliures anciennes.</p></label>
+  </div>
+  <div class="grid2">
+    <div class="q">
+      <label class="field"><span>Titre du projet</span><input type="text" data-k="cr_titre" id="cr_titre"></label>
+      <label class="field"><span>Intention en une phrase</span><input type="text" data-k="cr_intention" id="cr_intention"></label>
+      <label class="field"><span>Traces utilisées et traitements appliqués</span><textarea data-k="cr_traces" id="cr_traces" style="min-height:80px"></textarea></label>
+    </div>
+    <div class="imgs"><div class="imgslot"><span class="label">Visuel final</span><div class="imgprev" data-imgprev="final"></div><div class="row"><label class="btn">Choisir une image<input type="file" accept="image/*" data-img="final" class="vh"></label><button type="button" data-imgdel="final" hidden>Retirer</button></div></div></div>
+  </div>
+  <div class="q"><h3><span class="qn">Q4</span>Analyse</h3><p>Expliquez comment votre pièce rend le phénomène lisible : quelle trace, quels choix graphiques (échelle, cadrage, contraste, typographie), et quel lien avec au moins une de vos références.</p><textarea data-k="q4" id="q4"></textarea></div>
+</section><section class="block" id="cartel">
+  <div class="sec-head"><div class="tag"><span class="eyebrow">05 · Synthèse</span></div><h2>Le cartel de votre pièce</h2></div>
+  <p class="lead" style="margin-top:0">Dans une exposition, le cartel est le petit texte posé à côté de l'œuvre. Il dit ce qu'on regarde, comment c'est fait et pourquoi. C'est votre synthèse : elle doit tenir en 100 à 150 mots, citer au moins une de vos références entre parenthèses et expliquer le phénomène à un public non spécialiste.</p>
+  <div class="grid2">
+    <div class="q cartel-form">
+      <h3><span class="qn">S1</span>Cartel</h3>
+      <label class="field"><span>Titre de la pièce</span><input type="text" data-k="ca_titre" id="ca_titre"></label>
+      <label class="field"><span>Technique et support</span><input type="text" data-k="ca_tech" id="ca_tech" placeholder="ex. Suminagashi, encre de Chine sur papier machine, tirage numérique"></label>
+      <label class="field"><span>Texte du cartel</span><textarea data-k="ca_texte" id="ca_texte" style="min-height:200px"></textarea></label>
+      <div class="count" data-wc="ca_texte" data-min="100" data-max="150"></div>
+    </div>
+    <div class="q">
+      <h3><span class="qn">S2</span>Mes définitions</h3>
+      <p class="hint">Une phrase chacune, avec vos propres mots.</p>
+      <label class="field"><span>Tension superficielle</span><input type="text" data-k="d1" id="d1"></label><label class="field"><span>Tensioactif</span><input type="text" data-k="d2" id="d2"></label><label class="field"><span>Effet Marangoni</span><input type="text" data-k="d3" id="d3"></label><label class="field"><span>Absorption (capillarité)</span><input type="text" data-k="d4" id="d4"></label>
+    </div>
+  </div>
+  <div class="q"><h3><span class="qn">S3</span>Auto-évaluation</h3><div class="selfeval" id="selfeval"></div></div>
+</section><section class="block" id="export">
+  <div class="final">
+    <span class="eyebrow" style="color:color-mix(in srgb,var(--paper) 70%,transparent)">06 · Rendu</span>
+    <h2>Générer mon dossier PDF</h2>
+    <ul class="checklist" id="checklist"></ul>
+    <p style="font-size:15px">Le bouton ouvre la fenêtre d'impression. Choisissez <b>« Enregistrer au format PDF »</b> (ou « Microsoft Print to PDF ») comme imprimante. Le nom du fichier est proposé automatiquement. Déposez ensuite le PDF là où votre enseignant l'indique.</p>
+    <div class="row">
+      <button id="makePdf">Générer mon dossier PDF</button>
+      <button class="ghost" id="saveJson">Télécharger ma sauvegarde</button>
+      <button class="ghost" id="loadJsonBtn">Reprendre une sauvegarde</button>
+      <input type="file" id="loadJson" accept="application/json,.json" hidden>
+      <button class="ghost" id="reset">Tout effacer</button>
+    </div>
+    <p id="resetConfirm" hidden style="font-size:14px">Toutes vos réponses et images seront effacées de ce navigateur. <button id="resetYes" style="padding:4px 10px">Oui, tout effacer</button> <button id="resetNo" class="ghost" style="padding:4px 10px">Annuler</button></p>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">Support pédagogique · ESAAT · DN MADe Graphisme, parcours multisupport · Technologie et matériaux · Encres, séance 2. Valeurs numériques indicatives (ordres de grandeur) ; vérifiez-les dans vos sources.</div></footer>
+<div id="report"></div>
+<div class="toast" id="toast" hidden></div>
+<script>
+/* Socle commun aux ateliers : enregistrement, carnet d'essais, sources, images, cartel, dossier PDF */
+function Atelier(cfg){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+let state={};
+try{state=JSON.parse(localStorage.getItem(cfg.key)||"{}")||{}}catch(e){state={}}
+let warned=false;
+function save(){try{localStorage.setItem(cfg.key,JSON.stringify(state));warned=false}catch(e){if(!warned){warned=true;toast("Enregistrement impossible dans ce navigateur (mémoire pleine ?). Téléchargez votre sauvegarde.")}} updateNav();updateChecklist();}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,3200)}
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+function words(s){return (s||"").trim().split(/\s+/).filter(Boolean).length}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+if(!state.date){state.date=new Date().toLocaleDateString("fr-FR")}
+
+/* ---------- champs simples ---------- */
+function countAll(){$$("[data-wc]").forEach(c=>{const k=c.dataset.wc,mn=+c.dataset.min,mx=+c.dataset.max;const n=words(state[k]);c.textContent=n+(n>1?" mots":" mot")+" · attendu : "+mn+" à "+mx;c.style.color=n>=mn&&n<=mx?css("--ok"):n>mx?css("--warn"):css("--muted")})}
+function bindFields(){
+  $$("[data-k]").forEach(el=>{
+    const k=el.dataset.k;
+    if(el.type==="radio"){el.checked=state[k]===el.value;el.addEventListener("change",()=>{state[k]=el.value;save()})}
+    else{el.value=state[k]||"";el.addEventListener(el.tagName==="SELECT"?"change":"input",()=>{state[k]=el.value;countAll();save()})}
+  });
+}
+
+/* ---------- listes : carnet d'essais et sources ---------- */
+function opts(list,cur){return `<option value=""></option>`+list.map(t=>`<option ${cur===t?"selected":""}>${esc(t)}</option>`).join("")}
+const LISTS={
+  essais:{box:"#essais",add:"#addEssai",min:4,label:"Essai",render:s=>`
+    <label class="field w3"><span>Paramètre testé (un seul à la fois)</span><select data-f="param">${opts(cfg.params,s.param)}</select></label>
+    <label class="field w3"><span>Conditions précises (valeurs, matériel)</span><input type="text" data-f="cond" value="${esc(s.cond)}"></label>
+    <label class="field w3"><span>Résultat</span><select data-f="res">${opts(cfg.results,s.res)}</select></label>
+    <label class="field w3"><span>Photo / trace n°</span><input type="text" data-f="photo" value="${esc(s.photo)}"></label>
+    <label class="field w6"><span>Ce que j'observe</span><textarea data-f="obs" style="min-height:64px">${esc(s.obs)}</textarea></label>
+    <label class="field w6"><span>Explication physique (avec le vocabulaire de la fiche 01)</span><textarea data-f="expl" style="min-height:64px">${esc(s.expl)}</textarea></label>`},
+  sources:{box:"#sources",add:"#addSrc",min:3,label:"Référence",render:s=>`
+    <label class="field w3"><span>Nature de la référence</span><select data-f="type">${opts(cfg.srcTypes,s.type)}</select></label>
+    <label class="field w3"><span>Auteur, artiste ou organisme</span><input type="text" data-f="auteur" value="${esc(s.auteur)}"></label>
+    <label class="field w3"><span>Titre de l'œuvre, du projet ou du document</span><input type="text" data-f="titre" value="${esc(s.titre)}"></label>
+    <label class="field w3"><span>URL ou référence (livre, musée…)</span><input type="text" data-f="url" value="${esc(s.url)}" placeholder="https://…"></label>
+    <label class="field w2"><span>Date de l'œuvre ou de publication</span><input type="text" data-f="datep" value="${esc(s.datep)}"></label>
+    <label class="field w2"><span>Consulté le</span><input type="text" data-f="datec" value="${esc(s.datec)}"></label>
+    <label class="field w2"><span>Fiabilité estimée</span><select data-f="fiab">${opts(["Très fiable","Fiable","À recouper","Peu fiable"],s.fiab)}</select></label>
+    <label class="field w6"><span>Ce que j'en retiens (avec mes mots) et ce que cela apporte à mon projet</span><textarea data-f="retiens" style="min-height:70px">${esc(s.retiens)}</textarea></label>`}
+};
+function renderList(name){
+  const L=LISTS[name];if(!$(L.box))return;
+  if(!Array.isArray(state[name]))state[name]=[];
+  while(state[name].length<L.min)state[name].push({});
+  $(L.box).innerHTML=state[name].map((s,i)=>`<div class="src" data-i="${i}"><div class="w6 head"><b style="font-family:var(--f-display)">${L.label} ${i+1}</b>${i>=L.min?`<button type="button" data-del="${i}" style="padding:4px 10px">Retirer</button>`:""}</div>${L.render(s)}</div>`).join("");
+}
+function bindList(name){
+  const L=LISTS[name],box=$(L.box);if(!box)return;
+  const h=e=>{const f=e.target.dataset.f;if(!f)return;const i=+e.target.closest(".src").dataset.i;state[name][i][f]=e.target.value;save()};
+  box.addEventListener("input",h);box.addEventListener("change",h);
+  box.addEventListener("click",e=>{const d=e.target.dataset.del;if(d!=null){state[name].splice(+d,1);save();renderList(name)}});
+  $(L.add).addEventListener("click",()=>{state[name].push({});save();renderList(name)});
+}
+function validEssais(){return (state.essais||[]).filter(e=>e.param&&e.res&&words(e.obs)>=5&&words(e.expl)>=5).length}
+function goodSources(){return (state.sources||[]).filter(s=>s.titre&&s.url&&(s.auteur||"").trim()&&words(s.retiens)>=8)}
+function validSources(){return goodSources().length}
+function srcTypes(){return new Set(goodSources().map(s=>s.type).filter(Boolean)).size}
+
+/* ---------- images (photos des traces, visuel final) ---------- */
+function showImg(k){
+  const box=$(`[data-imgprev="${k}"]`);if(!box)return;const v=(state.img||{})[k];
+  box.innerHTML=v?`<img src="${v}" alt="Image importée">`:"<span>Aucune image</span>";
+  const del=$(`[data-imgdel="${k}"]`);if(del)del.hidden=!v;
+}
+function bindImgs(){
+  $$("[data-img]").forEach(inp=>{
+    const k=inp.dataset.img;showImg(k);
+    inp.addEventListener("change",()=>{
+      const f=inp.files[0];if(!f)return;const fr=new FileReader();
+      fr.onload=()=>{const im=new Image();
+        im.onload=()=>{const M=1100;const sc=Math.min(1,M/Math.max(im.naturalWidth,im.naturalHeight));const c=document.createElement("canvas");c.width=Math.round(im.naturalWidth*sc);c.height=Math.round(im.naturalHeight*sc);const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);
+          state.img=state.img||{};state.img[k]=c.toDataURL("image/jpeg",.72);save();showImg(k);inp.value="";toast("Image ajoutée.")};
+        im.onerror=()=>toast("Format d'image non reconnu : utilisez une image JPG ou PNG.");
+        im.src=fr.result};
+      fr.readAsDataURL(f);
+    });
+  });
+  $$("[data-imgdel]").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.imgdel;if(state.img)delete state.img[k];save();showImg(k)}));
+}
+
+/* ---------- auto-évaluation ---------- */
+const SKILLS=[["rech","Rechercher : trouver, évaluer et citer des références"],["ana","Analyser : relier un phénomène physico-chimique à un effet graphique"],["syn","Synthétiser : rédiger un texte court, structuré et argumenté"]];
+const LV=["Pas encore","En cours","Acquis","Maîtrisé"];
+function renderSelf(){
+  state.self=state.self||{};
+  $("#selfeval").innerHTML=SKILLS.map(([k,t])=>`<div class="r"><span>${t}</span><div class="lvl" role="radiogroup" aria-label="${esc(t)}">${LV.map((l,j)=>`<label><input type="radio" name="se_${k}" value="${l}" id="se_${k}_${j}" ${state.self[k]===l?"checked":""}>${l}</label>`).join("")}</div></div>`).join("");
+  $("#selfeval").addEventListener("change",e=>{const m=e.target.name.match(/se_(\w+)/);if(m){state.self[m[1]]=e.target.value;save()}});
+}
+
+/* ---------- navigation & checklist ---------- */
+const H={get s(){return state},words,validEssais,validSources,srcTypes};
+function updateNav(){const d=cfg.done(H);$$("#stepnav a").forEach(a=>a.classList.toggle("done",!!d[a.dataset.step]))}
+function updateChecklist(){$("#checklist").innerHTML=cfg.checklist(H).map(([t,ok])=>`<li class="${ok?"ok":""}">${esc(t)}</li>`).join("")}
+
+/* ---------- dossier PDF ---------- */
+function ans(v){return v&&String(v).trim()?`<div class="ans">${esc(String(v).trim())}</div>`:`<div class="ans empty">Non renseigné</div>`}
+function buildReport(){
+  const s=state,n=(s.nom||"").toUpperCase(),p=s.prenom||"",img=s.img||{};
+  let h=`<div class="rbar"><span style="background:#009FD8"></span><span style="background:#D6006F"></span><span style="background:#F5C400"></span><span style="background:#15171F"></span></div>
+  <h1>${cfg.rTitle}</h1><div>${cfg.rSub}</div>
+  <div class="meta"><div><small>Nom</small><b>${esc(n)}</b></div><div><small>Prénom</small><b>${esc(p)}</b></div><div><small>Classe</small>${esc(s.classe||"")}</div><div><small>Date</small>${esc(s.date||"")}</div></div>`;
+  h+=`<h2>1. Comprendre le phénomène</h2>`;cfg.phenQ.forEach(([k,t])=>{h+=`<h3>${t}</h3>`+ans(s[k])});
+  h+=`<h2>2. Carnet d'expérimentation</h2><table><thead><tr><th>#</th><th style="width:22%">Paramètre et conditions</th><th style="width:13%">Résultat</th><th>Observation</th><th>Explication physique</th></tr></thead><tbody>`;
+  let ne=0;(s.essais||[]).forEach((e,i)=>{if(!(e.param||e.obs||e.expl||e.cond))return;ne++;h+=`<tr><td>${i+1}</td><td><b>${esc(e.param||"")}</b><br>${esc(e.cond||"")}${e.photo?"<br><i>trace "+esc(e.photo)+"</i>":""}</td><td>${esc(e.res||"")}</td><td>${esc(e.obs||"")}</td><td>${esc(e.expl||"")}</td></tr>`});
+  if(!ne)h+=`<tr><td colspan="5" class="empty">Aucun essai renseigné</td></tr>`;
+  h+=`</tbody></table>`;
+  const tr=["t1","t2","t3"].filter(k=>img[k]);
+  if(tr.length)h+=`<h3>Traces sélectionnées</h3><div class="imgrow">${tr.map(k=>`<img src="${img[k]}" alt="">`).join("")}</div>`;
+  h+=`<h3>${cfg.bilanQ[1]}</h3>`+ans(s[cfg.bilanQ[0]]);
+  h+=`<h2>3. Recherche documentaire</h2><p><b>Axe de recherche :</b> ${esc(s.notion||"—")}</p><table><thead><tr><th>#</th><th>Référence</th><th>Nature</th><th>Fiabilité</th></tr></thead><tbody>`;
+  (s.sources||[]).forEach((r,i)=>{if(!(r.titre||r.url||r.auteur))return;h+=`<tr><td>${i+1}</td><td>${esc(r.auteur||"?")}. <i>${esc(r.titre||"?")}</i>${r.datep?", "+esc(r.datep):""}. ${esc(r.url||"")}${r.datec?" (consulté le "+esc(r.datec)+")":""}</td><td>${esc(r.type||"")}</td><td>${esc(r.fiab||"")}</td></tr>`});
+  h+=`</tbody></table>`;
+  (s.sources||[]).forEach((r,i)=>{if(r.retiens&&r.retiens.trim())h+=`<h3>Référence ${i+1} : ce que j'en retiens</h3>`+ans(r.retiens)});
+  h+=`<h3>${cfg.crossQ[1]}</h3>`+ans(s[cfg.crossQ[0]]);
+  h+=`<h2>4. Création</h2><table><tbody>${cfg.creaFields.map(([l,k,map])=>`<tr><th style="width:30%">${l}</th><td>${esc(map?(map[s[k]]||""):(s[k]||""))}</td></tr>`).join("")}</tbody></table>`;
+  h+=img.final?`<img src="${img.final}" alt="Visuel final">`:`<p class="empty">Visuel final non importé</p>`;
+  h+=`<h3>${cfg.creaQ[1]}</h3>`+ans(s[cfg.creaQ[0]]);
+  h+=`<h2>5. Cartel et définitions</h2><div class="cartel"><b>${esc(s.ca_titre||"Sans titre")}</b><br>${esc(p)} ${esc(n)}, ${new Date().getFullYear()}<br><i>${esc(s.ca_tech||"")}</i><p>${esc((s.ca_texte||"").trim())||"<span class='empty'>Texte du cartel non renseigné</span>"}</p></div><p style="font-size:9pt">Cartel : ${words(s.ca_texte)} mots.</p>`;
+  h+=`<table><tbody>${cfg.defs.map(([l,k])=>`<tr><th style="width:30%">${l}</th><td>${esc(s[k]||"")}</td></tr>`).join("")}</tbody></table>`;
+  h+=`<h2>6. Évaluation des compétences</h2><table class="grid-eval"><thead><tr><th>Compétence</th><th>Auto-évaluation</th><th>Pas encore</th><th>En cours</th><th>Acquis</th><th>Maîtrisé</th></tr></thead><tbody>${SKILLS.map(([k,t])=>`<tr><td>${t}</td><td style="text-align:center">${esc((s.self||{})[k]||"—")}</td><td></td><td></td><td></td><td></td></tr>`).join("")}</tbody></table>
+   <div class="sign"><div>Appréciation de l'enseignant :</div><div>Signature et date :</div></div>
+   <div class="foot">Document généré le ${new Date().toLocaleString("fr-FR")} depuis l'atelier numérique « ${cfg.short} ».</div>`;
+  $("#report").innerHTML=h;
+}
+$("#makePdf").addEventListener("click",()=>{
+  if(!state.nom||!state.prenom){toast("Renseignez votre nom et votre prénom (étape 00).");location.hash="#identite";$("#nom").focus();return}
+  buildReport();
+  const old=document.title;const clean=x=>x.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9-]+/g,"_");
+  document.title=cfg.filePrefix+"_"+clean(state.nom.toUpperCase())+"_"+clean(state.prenom);
+  setTimeout(()=>{window.print();setTimeout(()=>document.title=old,1000)},80);
+});
+window.addEventListener("beforeprint",buildReport);
+
+/* ---------- sauvegarde fichier ---------- */
+$("#saveJson").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(state)],{type:"application/json"});const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download="sauvegarde_"+cfg.filePrefix.toLowerCase()+"_"+((state.nom||"eleve").replace(/\W+/g,"_"))+".json";document.body.appendChild(a);a.click();a.remove();toast("Sauvegarde téléchargée.");
+});
+$("#loadJsonBtn").addEventListener("click",()=>$("#loadJson").click());
+$("#loadJson").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||typeof o!=="object")throw 0;state=o;save();location.reload()}catch(err){toast("Ce fichier n'est pas une sauvegarde valide.")}};r.readAsText(f)});
+$("#reset").addEventListener("click",()=>{$("#resetConfirm").hidden=false});
+$("#resetNo").addEventListener("click",()=>{$("#resetConfirm").hidden=true});
+$("#resetYes").addEventListener("click",()=>{try{localStorage.removeItem(cfg.key)}catch(e){}state={};location.reload()});
+
+/* ---------- init ---------- */
+bindFields();renderList("essais");bindList("essais");renderList("sources");bindList("sources");bindImgs();renderSelf();countAll();
+updateNav();updateChecklist();
+return {$,$$,css,toast,get state(){return state},save,words,esc};
+}
+
+(function(){
+"use strict";
+const CASES={A:"Affiche A3",B:"Couverture de livre ou de revue",C:"Lettrine ou alphabet",D:"Papier de garde / motif répétable"};
+function doneA(h){const s=h.s,w=h.words;return{
+  identite:!!(s.nom&&s.prenom),
+  phenomene:w(s.q1)>=15,
+  experimentation:h.validEssais()>=4&&w(s.q2)>=15,
+  references:h.validSources()>=3&&h.srcTypes()>=3&&w(s.qcross)>=15,
+  creation:!!(s.cr_format&&w(s.cr_titre)>=1&&w(s.cr_intention)>=5&&(s.img||{}).final&&w(s.q4)>=20),
+  cartel:w(s.ca_texte)>=100&&["d1","d2","d3","d4"].every(k=>w(s[k])>=3)}}
+const A=Atelier({
+  key:"atelier-encres-suminagashi-v1",filePrefix:"Suminagashi",short:"Suminagashi",
+  rTitle:"Quand la tension superficielle dessine",
+  rSub:"Dossier de recherche, d'expérimentation et de création · Suminagashi · Technologie et matériaux · DN MADe Graphisme, parcours multisupport · ESAAT",
+  params:["Ordre et nombre de gouttes","Concentration de tensioactif","Encre pure ou diluée","Température de l'eau","Type de papier","Temps de contact du papier","Déformation (souffle, stylet, peigne)","Autre"],
+  results:["Réussi, exploitable","Partiellement réussi","Échec instructif"],
+  srcTypes:["Historique / artistique","Design contemporain (graphisme, édition, motion)","Scientifique / technique","Institutionnelle (musée, UNESCO, bibliothèque)","Autre"],
+  phenQ:[["q1","Q1 · La simulation : encre, tensioactif et effet Marangoni"]],
+  bilanQ:["q2","Q2 · Bilan des essais"],
+  crossQ:["qcross","Q3 · Croisement des références"],
+  creaFields:[["Format","cr_format",CASES],["Titre du projet","cr_titre"],["Intention en une phrase","cr_intention"],["Traces utilisées et traitements","cr_traces"]],
+  creaQ:["q4","Q4 · Du phénomène au choix graphique"],
+  defs:[["Tension superficielle","d1"],["Tensioactif","d2"],["Effet Marangoni","d3"],["Absorption (capillarité)","d4"]],
+  done:h=>doneA(h),
+  checklist:h=>{const s=h.s,w=h.words,d=doneA(h);return[
+    ["Nom et prénom renseignés",d.identite],
+    ["Q1 : simulation expliquée",d.phenomene],
+    ["Carnet : au moins 4 essais complets ("+h.validEssais()+") et bilan Q2",d.experimentation],
+    ["Au moins une trace photographiée",!!["t1","t2","t3"].find(k=>(s.img||{})[k])],
+    ["3 références complètes de 3 natures différentes ("+h.validSources()+" complètes, "+h.srcTypes()+" natures) et croisement",d.references],
+    ["Création : format, titre, intention, visuel importé et Q4",!!d.creation],
+    ["Cartel de 100 à 150 mots ("+w(s.ca_texte)+") et 4 définitions",d.cartel]]}
+});
+const {$,$$}=A;
+
+/* ================= Simulation du bain de suminagashi ================= */
+const cv=$("#cvMarb"),g=cv.getContext("2d"),W=cv.width,H=cv.height;
+const WATER="#D9E4EA";
+const PAPERS={
+  machine:{bg:"#FBFAF6",blur:1.1,alpha:.95,txt:"Papier machine : l'encre est bien absorbée, les bords s'adoucissent légèrement."},
+  japon:{bg:"#F3EEE2",blur:2.2,alpha:1,txt:"Papier fin et absorbant : transfert dense, bords plus flous (capillarité entre les fibres)."},
+  kraft:{bg:"#C9A57C",blur:1.4,alpha:.9,txt:"Kraft : bonne absorption, mais le fond brun réduit le contraste."},
+  couche:{bg:"#FFFFFF",blur:.3,alpha:.45,txt:"Papier couché : la couche minérale absorbe mal l'eau, l'encre se transfère mal et reste pâle (mouillabilité, séance 1)."}
+};
+let drops=[],mode="ink",printed=false,tone="pur",busy=false;
+const N0=90;
+function circle(cx,cy,r){const p=[];for(let i=0;i<N0;i++){const a=i/N0*Math.PI*2;p.push(cx+r*Math.cos(a),cy+r*Math.sin(a))}return p}
+function inView(x,y){return x>-60&&x<W+60&&y>-60&&y<H+60}
+function refine(d){
+  const p=d.p,n=p.length/2;if(n>4000)return;const q=[];
+  for(let i=0;i<n;i++){const x=p[2*i],y=p[2*i+1],j=(i+1)%n,x2=p[2*j],y2=p[2*j+1];q.push(x,y);
+    const L=Math.hypot(x2-x,y2-y);if(L>7&&(inView(x,y)||inView(x2,y2))){const k=Math.min(8,Math.floor(L/7));for(let m=1;m<=k;m++){const t=m/(k+1);q.push(x+(x2-x)*t,y+(y2-y)*t)}}}
+  d.p=q;
+}
+function addDrop(cx,cy,r,kind){
+  const r2=r*r;
+  drops.forEach(d=>{const p=d.p;for(let i=0;i<p.length;i+=2){const dx=p[i]-cx,dy=p[i+1]-cy;const d2=Math.max(1e-6,dx*dx+dy*dy);const f=Math.sqrt(1+r2/d2);p[i]=cx+dx*f;p[i+1]=cy+dy*f}refine(d)});
+  drops.push({p:circle(cx,cy,r),kind,tone});
+  if(drops.length>140)drops.shift();
+  render();
+}
+function stylus(x0,y0,x1,y1){
+  const dx=x1-x0,dy=y1-y0,z=Math.hypot(dx,dy);if(z<.5)return;const mx=dx/z,my=dy/z,al=16;
+  drops.forEach(d=>{const p=d.p;for(let i=0;i<p.length;i+=2){const px=p[i]-x0,py=p[i+1]-y0;let t=(px*dx+py*dy)/(z*z);t=Math.max(0,Math.min(1,t));const ex=p[i]-(x0+t*dx),ey=p[i+1]-(y0+t*dy);const dist=Math.hypot(ex,ey);const u=al/(dist+al);const s=z*u*u;p[i]+=mx*s;p[i+1]+=my*s}refine(d)});
+}
+function comb(vertical){
+  const step=44,z=55,al=7;
+  drops.forEach(d=>{const p=d.p;for(let i=0;i<p.length;i+=2){
+    const c=vertical?p[i]:p[i+1];const k=Math.round((c-step/2)/step)*step+step/2;const dist=Math.abs(c-k);const s=z*al/(dist+al);
+    if(vertical)p[i+1]+=s;else p[i]+=s;}refine(d)});
+  render();
+}
+function inkCol(t){return t==="pur"?"#16181E":"#6E7480"}
+function render(){
+  const P=PAPERS[$("#papMarb").value];
+  g.save();g.clearRect(0,0,W,H);
+  const bg=printed?P.bg:WATER;g.fillStyle=bg;g.fillRect(0,0,W,H);
+  if(printed){g.translate(W,0);g.scale(-1,1);if("filter" in g)g.filter=`blur(${P.blur}px)`}
+  drops.forEach(d=>{const p=d.p;g.beginPath();g.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)g.lineTo(p[i],p[i+1]);g.closePath();
+    if(d.kind==="ink"){g.globalAlpha=printed?P.alpha:.94;g.fillStyle=inkCol(d.tone)}else{g.globalAlpha=1;g.fillStyle=bg}
+    g.fill()});
+  g.restore();g.globalAlpha=1;
+  if(!printed){g.fillStyle="rgba(255,255,255,.55)";g.font="11px "+A.css("--f-mono");g.fillText("BAIN D'EAU · vue de dessus",10,H-10)}
+  else{g.fillStyle="rgba(0,0,0,.45)";g.font="11px "+A.css("--f-mono");g.fillText("TIRAGE SUR PAPIER · image inversée (miroir)",10,H-10)}
+  const ni=drops.filter(d=>d.kind==="ink").length,ns=drops.length-ni;
+  $("#marbInfo").textContent=ni+" goutte"+(ni>1?"s":"")+" d'encre · "+ns+" goutte"+(ns>1?"s":"")+" de tensioactif";
+  $("#marbTxt").textContent=printed?P.txt:MODE_TXT[mode];
+}
+const MODE_TXT={
+  ink:"Encre : la goutte forme un disque à la surface. En s'étalant, elle repousse tous les anneaux déjà présents, sans les mélanger.",
+  surf:"Tensioactif : il abaisse localement la tension superficielle. La surface « fuit » vers les zones de plus forte tension (effet Marangoni) et repousse l'encre : un disque d'eau claire apparaît.",
+  stylus:"Stylet (cure-dent, souffle) : glissez sur le bain. La surface entraîne les anneaux dans le sens du geste, de moins en moins loin du trait."
+};
+function pos(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height]}
+let last=null,raf=0;
+cv.addEventListener("pointerdown",e=>{
+  if(printed){A.toast("Revenez au bain pour continuer (bouton « Revenir au bain »).");return}
+  const [x,y]=pos(e);const r=+$("#dropR").value;
+  if(mode==="stylus"){last=[x,y];cv.setPointerCapture(e.pointerId)}
+  else addDrop(x,y,r,mode==="ink"?"ink":"surf");
+});
+cv.addEventListener("pointermove",e=>{if(!last||mode!=="stylus")return;const [x,y]=pos(e);stylus(last[0],last[1],x,y);last=[x,y];if(!raf)raf=requestAnimationFrame(()=>{raf=0;render()})});
+["pointerup","pointercancel"].forEach(t=>cv.addEventListener(t,()=>{last=null}));
+$$("[data-mmode]").forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.mmode;$$("[data-mmode]").forEach(x=>x.setAttribute("aria-pressed",x===b));render()}));
+$$("[data-tone]").forEach(b=>b.addEventListener("click",()=>{tone=b.dataset.tone;$$("[data-tone]").forEach(x=>x.setAttribute("aria-pressed",x===b))}));
+$("#dropR").addEventListener("input",()=>$("#dropRv").textContent=$("#dropR").value+" px");
+$("#seq").addEventListener("click",()=>{
+  if(busy||printed)return;busy=true;let k=0;const cx=W/2+(Math.random()-.5)*60,cy=H/2+(Math.random()-.5)*40;
+  const step=()=>{addDrop(cx,cy,22,k%2?"surf":"ink");k++;if(k<16)setTimeout(step,90);else busy=false};step();
+});
+$("#combH").addEventListener("click",()=>{if(!printed)comb(false)});
+$("#combV").addEventListener("click",()=>{if(!printed)comb(true)});
+$("#clearMarb").addEventListener("click",()=>{drops=[];printed=false;$("#printMarb").textContent="Transférer sur papier";render()});
+$("#printMarb").addEventListener("click",()=>{printed=!printed;$("#printMarb").textContent=printed?"Revenir au bain":"Transférer sur papier";$("#printMarb").setAttribute("aria-pressed",printed);render()});
+$("#papMarb").addEventListener("change",render);
+$("#dropRv").textContent=$("#dropR").value+" px";
+render();
+})();
+
+</script>
+</body>
+</html>
